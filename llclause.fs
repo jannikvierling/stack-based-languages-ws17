@@ -77,8 +77,3 @@ end-struct clause%
     literal clause1 copy-clause remove-literal
     literal negate clause2 copy-clause remove-literal
     merge-clauses ;
-
-
-
-        
-        
