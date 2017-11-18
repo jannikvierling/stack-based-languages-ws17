@@ -7,6 +7,11 @@ This repository contains a naive implementation of resolution theorem proving fo
 
 ## Running the Tests
 
+### Running module tests
+
+To run the tests for a module `<module>` use ```gforth <module>.fs <module>_test.fs -e bye```.
+A test that terminated without error usually prints `-1` any other output indicates an error.
+
 ## Usage
 
 ## Examples
