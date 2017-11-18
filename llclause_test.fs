@@ -167,8 +167,8 @@ resolve-all
 \ todo add a parsing word which repeats a parsed word a given amount of times
 \ todo so we could abbrevitate clause creation 1 2 3 0 3 times insert-literal
 
-1 2 0 insert-literal insert-literal
--1 -2 0 insert-literal insert-literal
+1 2 0 2 times insert-literal
+-1 -2 0 2 times insert-literal
 resolve-all
 
 2 = .
@@ -189,8 +189,5 @@ clauses-equal .
 
 -1 1 2 3 4 5 -2
 0
-insert-literal insert-literal
-insert-literal insert-literal
-insert-literal insert-literal
-insert-literal
+7 times insert-literal
 show-clause

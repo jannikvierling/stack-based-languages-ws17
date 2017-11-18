@@ -121,3 +121,7 @@ end-struct clause%
             ENDIF
             clause-next @
     REPEAT drop ;
+
+: times ( n "name" -- )
+    ' { xt } 0 u+do xt execute loop ;
+    
