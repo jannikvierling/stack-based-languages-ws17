@@ -93,4 +93,31 @@ end-struct clause%
             clauses-equal
         ENDIF
     ENDIF ;
-            
+
+: contains-literal ( literal clause -- x ) recursive
+    \ Checks whether if a given clause contains a given literal.
+    \
+    \ x: A boolean value containing -1 if the literal is contained in the
+    \ clause, 0 otherwise.
+    dup 0= IF 2drop false
+    ELSE
+        2dup clause-literal @ = IF
+            2drop true
+        ELSE
+            clause-next @ contains-literal
+        ENDIF
+    ENDIF ;
+
+
+\ todo: Is is possible to simplify this word by computing the
+\ resolvable atoms first?.
+: resolve-all ( clause1 clause2 -- res_1 ... res_n n )
+    { clause1 clause2 }
+    0 clause1 BEGIN
+        dup WHILE
+            dup clause-literal @ negate clause2 contains-literal IF
+                dup clause-literal @ clause1 clause2 resolve-clauses
+                rot 1+ rot
+            ENDIF
+            clause-next @
+    REPEAT drop ;

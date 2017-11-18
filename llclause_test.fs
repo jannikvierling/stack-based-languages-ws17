@@ -139,6 +139,46 @@ clauses-equal invert .
 0 insert-literal insert-literal
 clauses-equal .
 
+\ Test: contains-literal
+
+\ (1) Empty list should always return false
+1 0 contains-literal invert .
+
+\ (2) Clause containing given literal should return true
+1 2
+0 insert-literal insert-literal
+2 swap contains-literal .
+
+\ (3) Clause not containing given literal should return false
+1 2 0 insert-literal insert-literal
+3 swap contains-literal invert .
+
+\ Test: resolve-all.
+
+\ (1) Clauses having no resolvable literals should not resolve.
+
+1 0 insert-literal
+2 0 insert-literal
+resolve-all
+0= .
+
+\ (2) Clauses having multiple resolvable literals should resolve on all.
+
+\ todo add a parsing word which repeats a parsed word a given amount of times
+\ todo so we could abbrevitate clause creation 1 2 3 0 3 times insert-literal
+
+1 2 0 insert-literal insert-literal
+-1 -2 0 insert-literal insert-literal
+resolve-all
+
+2 = .
+
+-1 1 0 insert-literal insert-literal  ( expected clause )
+clauses-equal .
+
+-2 2 0 insert-literal insert-literal  ( expected clause )
+clauses-equal .
+
 \ Test: show-clause.
 
 \ (1) Empty clause should show as [ ].
