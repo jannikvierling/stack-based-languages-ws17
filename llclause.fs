@@ -77,3 +77,20 @@ end-struct clause%
     literal clause1 copy-clause remove-literal
     literal negate clause2 copy-clause remove-literal
     merge-clauses ;
+
+: clauses-equal ( clause1 clause2 -- x ) recursive
+    \ Compares two clauses for equality.
+    \ clause1, clause2: Adresses to clauses.
+    \ x: -1 if the clauses are equal, 0 otherwise.
+    { clause1 clause2 }
+    clause1 0= IF
+        clause2 0= IF true ELSE false ENDIF
+    ELSE
+        clause2 0= IF false
+        ELSE
+            clause1 clause-literal @ clause2 clause-literal @ =
+            and clause1 clause-next @ clause2 clause-next @
+            clauses-equal
+        ENDIF
+    ENDIF ;
+            

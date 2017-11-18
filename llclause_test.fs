@@ -118,6 +118,27 @@ resolve-clauses dup
 clause-literal @ 1 = .
 clause-next @ clause-literal @ 3 = .
 
+\ Test: clauses-equal.
+
+\ (1) Empty clauses should be equal.
+
+0 0 clauses-equal . 
+
+\ (2) Unequal clauses should not be equal
+
+1
+0 insert-literal
+1 2
+0 insert-literal insert-literal
+clauses-equal invert .
+
+\ (3) Clauses with same literals should be equal
+1 2
+0 insert-literal insert-literal
+1 2
+0 insert-literal insert-literal
+clauses-equal .
+
 \ Test: show-clause.
 
 \ (1) Empty clause should show as [ ].
