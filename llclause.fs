@@ -7,7 +7,7 @@ end-struct clause%
     { clause }  clause 0= IF
         0
     ELSE
-        clause clause-next @ clause-next 1+
+        clause clause-next @ clause-size 1+
     ENDIF ;
 
 : copy-clause ( clause1 -- clause2 ) recursive
