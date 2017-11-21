@@ -104,10 +104,11 @@ clause-next @ clause-literal @ 2 = .
 \ (2) Resolvent should not contain duplicates
 
 1
-1 0 insert-literal 2 swap insert-literal
--1 0 insert-literal 2 swap insert-literal
+1 2 0 insert-literal insert-literal
+-1 2 0 insert-literal insert-literal
 resolve-clauses dup
 clause-next @ 0= .
+clause-literal @ 2 = .
 
 \ (3) Resolvent should be ordered.
 
@@ -133,10 +134,11 @@ clause-next @ clause-literal @ 3 = .
 clauses-equal invert .
 
 \ (3) Clauses with same literals should be equal
-1 2
-0 insert-literal insert-literal
-1 2
-0 insert-literal insert-literal
+
+1 2 3
+0 3 times insert-literal
+1 2 3
+0 3 times insert-literal
 clauses-equal .
 
 \ Test: contains-literal

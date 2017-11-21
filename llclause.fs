@@ -89,8 +89,8 @@ end-struct clause%
         clause2 0= IF false
         ELSE
             clause1 clause-literal @ clause2 clause-literal @ =
-            and clause1 clause-next @ clause2 clause-next @
-            clauses-equal
+            clause1 clause-next @ clause2 clause-next @
+            clauses-equal and
         ENDIF
     ENDIF ;
 
