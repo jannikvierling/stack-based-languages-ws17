@@ -57,7 +57,8 @@ end-struct clause%
     ENDIF ;
 
 : show-clause ( clause -- )
-    ." [ " show-clause' ." ]" ;
+    ." [ " show-clause' ." ]"
+    drop ;
 
 : merge-clauses' ( clause1 clause2 -- clause ) recursive
     { clause1 clause2 } clause2 0= IF
