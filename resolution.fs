@@ -54,10 +54,11 @@ require llclauseset.fs
 		set set-size merge-sets-from-stack
 	ENDIF ;
 
-10 constant max-depth
+100 constant max-depth
 
 : see-clause { clause working seen -- working' seen' }
 	clause seen resolve-with-set
+	seen swap substract-set
 	working merge-sets clause swap remove-clause
 	clause seen insert-clause
 	;
@@ -66,10 +67,10 @@ require llclauseset.fs
 \ -1 ... satisfiable
 \ 1 ... exceeded maximum recursion depth
 
-: is-sat' recursive { working seen depth }
-	cr cr ." iteration: " depth .
-	cr ." working: " working show-set
-	cr ." seen: " seen show-set
+: is-sat' recursive { working seen depth -- flag }
+\	cr cr ." iteration: " depth .
+\	cr ." working: " working show-set
+\	cr ." seen: " seen show-set
 	working 0= IF
 		-1
 	ELSE
@@ -86,4 +87,4 @@ require llclauseset.fs
 	ENDIF
 	;
 	
-: is-sat ( set -- depth ) 0 0 is-sat' ;
+: is-sat ( set -- flag ) 0 0 is-sat' ;
