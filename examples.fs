@@ -1,5 +1,5 @@
-require literals.fs
-require llclauses.fs
+require literal.fs
+require llclause.fs
 require llclauseset.fs
 require resolution.fs
 require helpers.fs
