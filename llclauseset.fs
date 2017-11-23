@@ -43,6 +43,16 @@ end-struct set%
 			set set-next !
 			set
 		ENDIF ENDIF ;
+		
+: substract-set recursive { settosubstract set -- set' }
+	settosubstract 0= IF
+		set
+	ELSE
+		settosubstract set-next @
+		settosubstract set-clause @ set remove-clause
+		substract-set
+	ENDIF
+	;
 
 : show-set' ( set1 -- ) recursive
     dup 0<> IF
@@ -76,3 +86,4 @@ end-struct set%
             set-next @ contains-clause
         ENDIF
     ENDIF ;
+
