@@ -6,6 +6,7 @@ struct
 end-struct clause%
 
 : clause-size ( clause -- n ) recursive
+    \ Computes a clause's size.
     { clause }  clause 0= IF
         0
     ELSE
@@ -13,6 +14,7 @@ end-struct clause%
     ENDIF ;
 
 : copy-clause ( clause1 -- clause2 ) recursive
+    \ Copies a clause.
     { clause } clause 0= IF
         0
     ELSE
@@ -22,6 +24,7 @@ end-struct clause%
     ENDIF ;
 
 : remove-literal ( literal clause1 -- clause2 ) recursive
+    \ Removes a literal from a clause.
     { literal clause } clause 0= IF
         0
     ELSE
@@ -35,6 +38,10 @@ end-struct clause%
     ENDIF ;
 
 : insert-literal ( literal clause1 -- clause2 ) recursive
+    \ Inserts a literal in a clause.
+    \
+    \ The "literal" is inserted into "clause1" only if this literal is
+    \ not yet present. The resulting clause "clause2" is ordered.
     { literal clause } clause 0= IF
         clause% %allot
         0 over clause-next !
@@ -52,6 +59,7 @@ end-struct clause%
             ENDIF ENDIF ENDIF ;
 
 : show-clause' ( clause1 -- ) recursive
+    \ See show-clause.
     dup 0<> IF
         dup
         clause-literal @ dec.
@@ -59,10 +67,15 @@ end-struct clause%
     ENDIF ;
 
 : show-clause ( clause -- )
+    \ Prints a clause.
+    \
+    \ The clause is displayed in the format [ l1 l2 ... ln ], where l1
+    \ < l2 < ... < ln
     ." [ " show-clause' ." ]"
     drop ;
 
 : merge-clauses' ( clause1 clause2 -- clause ) recursive
+    \ See merge-clauses.
     { clause1 clause2 } clause2 0= IF
         clause1
     ELSE
@@ -70,9 +83,14 @@ end-struct clause%
         clause2 clause-next @
         merge-clauses'
     ENDIF ;
-        
-: merge-clauses ( clause1 clause2 -- clause )
-    { clause1 clause2 } clause1 copy-clause clause2 merge-clauses' ;
+
+
+: merge-clauses { clause1 clause2 -- clause }
+    \ Merges two clauses.
+    \
+    \ This merge runs in time O(n1*n2) where n1, n2 are the sizes of
+    \ clauses clause1 and clause2, respectively.
+    clause1 copy-clause clause2 merge-clauses' ;
 		
 : fast-merge' recursive { result clause1 clause2 -- } 
 	clause1 0= IF
@@ -108,26 +126,32 @@ end-struct clause%
 		ENDIF
 	ENDIF ;
 
-\ Create a dummy first element to work with, then drop it
 : fast-merge { clause1 clause2 -- clause }
-	clause% %allot
+    \ Merges two clauses.
+    \
+    \ This clause merge runs in O(n1 + n2) where n1, n2 are the sizes of
+    \ clause1 and clause2, respectively.
+	clause% %allot \ create a dummy first element to work with, then drop it
 	0 over clause-next !
 	0 over clause-literal !
 	dup	clause1 clause2 fast-merge'
-	clause-next @ ;
+	clause-next @ ; \ todo: free the dummy element
 	
-\ Todo: Free the copies.
-\ Question: Doesn't gforth have some sort of garbage collection?
 : resolve-clauses ( literal clause1 clause2 -- resolvent )
+    \ Resolves two clauses upon a literal.
+    \
+    \ "literal": The resolved upon literal; this is a literal of
+    \ clause1 and its dual must appear in clause2.
     { literal clause1 clause2 }
     literal clause1 copy-clause remove-literal
     literal negate clause2 copy-clause remove-literal
-    fast-merge ;
+    fast-merge ; \ todo: free the copies
 
-: clauses-equal ( clause1 clause2 -- x ) recursive
+: clauses-equal ( clause1 clause2 -- f ) recursive
     \ Compares two clauses for equality.
-    \ clause1, clause2: Adresses to clauses.
-    \ x: -1 if the clauses are equal, 0 otherwise.
+    \
+    \ "clause1", "clause2": Adresses to clauses.
+    \ "f": true if the clauses are equal, false otherwise.
     { clause1 clause2 }
     clause1 0= IF
         clause2 0= IF true ELSE false ENDIF
@@ -140,11 +164,11 @@ end-struct clause%
         ENDIF
     ENDIF ;
 
-: contains-literal ( literal clause -- x ) recursive
+: contains-literal ( literal clause -- f ) recursive
     \ Checks whether if a given clause contains a given literal.
     \
-    \ x: A boolean value containing -1 if the literal is contained in the
-    \ clause, 0 otherwise.
+    \ "f": A boolean value containing true if the literal is contained in the
+    \ clause, false otherwise.
     dup 0= IF 2drop false
     ELSE
         2dup clause-literal @ = IF
