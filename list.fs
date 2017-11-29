@@ -6,9 +6,10 @@ list%
     cell% field clauselist-clause
 end-struct clauselist%
 
-variable working 0 working !
-variable number-seen 0 number-seen !
-create seen
+: list-search { selector comparator val list -- f }
+    list BEGIN dup 0<> WHILE dup selector execute @ val swap comparator execute IF
+                drop true exit
+            ENDIF list-next @ REPEAT drop false ;
 
 : list-length ( list -- n ) recursive
     \ "list" is a pointer to the first element of a linked list

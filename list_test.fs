@@ -20,6 +20,24 @@ drop \ Drop the 0.
 
 head list-length 3 = .
 
+\ Test: list-search.
+
+\ (1) Element not in list should not be found.
+' clause-literal
+' =
+-1
+1 2 3 4 5 6 0 6 times insert-literal
+list-search invert .
+
+
+\ (2) Element in list should be found.
+' clause-literal
+' =
+5
+1 2 3 4 5 6 0 6 times insert-literal
+list-search .
+
+
 \ Test: list-length.
 
 \ (1) Empty list should have length zero.
@@ -63,6 +81,7 @@ clauses-equal .
 
 
 \ Test: contains-clause.
+\ Todo implement tests
 
 \ (1) Contained clause should be found.
 
