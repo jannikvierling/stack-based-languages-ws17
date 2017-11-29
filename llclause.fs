@@ -115,16 +115,6 @@ end-struct clause%
 	dup	clause1 clause2 fast-merge'
 	clause-next @ ; \ todo: free the dummy element
 	
-: resolve-clauses ( literal clause1 clause2 -- resolvent )
-    \ Resolves two clauses upon a literal.
-    \
-    \ "literal": The resolved upon literal; this is a literal of
-    \ clause1 and its dual must appear in clause2.
-    { literal clause1 clause2 }
-    literal clause1 copy-clause remove-literal
-    literal negate clause2 copy-clause remove-literal
-    fast-merge ; \ todo: free the copies
-
 : clauses-equal ( clause1 clause2 -- f ) recursive
     \ Compares two clauses for equality.
     \
@@ -144,3 +134,25 @@ end-struct clause%
 
 : contains-literal ( literal clause -- f)
     ['] clause-literal ['] = 2swap list-search ;
+
+: resolve-clauses ( literal clause1 clause2 -- resolvent )
+    \ Resolves two clauses upon a literal.
+    \
+    \ "literal": The resolved upon literal; this is a literal of
+    \ clause1 and its dual must appear in clause2.
+    { literal clause1 clause2 }
+    literal clause1 copy-clause remove-literal
+    literal negate clause2 copy-clause remove-literal
+    fast-merge ; \ todo: free the copies
+
+: resolve-all ( clause1 clause2 -- res_1 ... res_n n )
+    \ Resolves two clauses upon all resolvable literals.
+    { clause1 clause2 }
+    0 clause1 BEGIN
+        dup WHILE
+            dup clause-literal @ negate clause2 contains-literal IF
+                dup clause-literal @ clause1 clause2 resolve-clauses
+                rot 1+ rot
+            ENDIF
+            clause-next @
+    REPEAT drop ;

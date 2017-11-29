@@ -2,21 +2,6 @@ require literal.fs
 require llclause.fs
 require llclauseset.fs
 
-\ todo: Is is possible to simplify this word by computing the
-\ resolvable atoms first?.
-\ In particular it can be done in linear (instead of quadratic) time
-\ Then again wlog all clauses have size 3 so it does not really matter
-: resolve-all ( clause1 clause2 -- res_1 ... res_n n )
-    { clause1 clause2 }
-    0 clause1 BEGIN
-        dup WHILE
-            dup clause-literal @ negate clause2 contains-literal IF
-                dup clause-literal @ clause1 clause2 resolve-clauses
-                rot 1+ rot
-            ENDIF
-            clause-next @
-    REPEAT drop ;
-
 : make-set-from-stack' recursive ( clause_1 ... clause_n n result -- set )
 	swap
 	dup 0= IF
