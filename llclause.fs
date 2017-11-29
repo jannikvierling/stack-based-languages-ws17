@@ -1,17 +1,13 @@
+require list.fs
 require literal.fs
 
-struct
-    cell% field clause-next
+list%
     cell% field clause-literal
 end-struct clause%
 
-: clause-size ( clause -- n ) recursive
-    \ Computes a clause's size.
-    { clause }  clause 0= IF
-        0
-    ELSE
-        clause clause-next @ clause-size 1+
-    ENDIF ;
+: clause-next list-next ;
+
+: clause-size list-length ;
 
 : copy-clause ( clause1 -- clause2 ) recursive
     \ Copies a clause.
@@ -83,7 +79,6 @@ end-struct clause%
         clause2 clause-next @
         merge-clauses'
     ENDIF ;
-
 
 : merge-clauses { clause1 clause2 -- clause }
     \ Merges two clauses.
@@ -164,16 +159,5 @@ end-struct clause%
         ENDIF
     ENDIF ;
 
-: contains-literal ( literal clause -- f ) recursive
-    \ Checks whether if a given clause contains a given literal.
-    \
-    \ "f": A boolean value containing true if the literal is contained in the
-    \ clause, false otherwise.
-    dup 0= IF 2drop false
-    ELSE
-        2dup clause-literal @ = IF
-            2drop true
-        ELSE
-            clause-next @ contains-literal
-        ENDIF
-    ENDIF ;
+: contains-literal ( literal clause -- f)
+    ['] clause-literal ['] = 2swap list-search ;

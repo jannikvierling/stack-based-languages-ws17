@@ -1,3 +1,7 @@
+require helpers.fs
+require llclause.fs
+require resolution.fs
+
 \ Test: clause-size
 
 \ (1) Empty clause should have size 0.

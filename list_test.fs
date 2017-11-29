@@ -85,9 +85,18 @@ clauses-equal .
 
 \ (1) Contained clause should be found.
 
-1 2 3 0 3 times insert-literal .
+-1 0 1 times insert-literal 
+ 1 0 1 times insert-literal 
+0 2 times append-if-new
+1 0 1 times insert-literal swap contains-clause .
 
 \ (2) Non-contained clause should not be found.
+
+-1 0 1 times insert-literal 
+ 1 0 1 times insert-literal 
+0 2 times append-if-new
+2 3 0 2 times insert-literal swap
+contains-clause invert .
 
 
 
