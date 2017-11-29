@@ -69,23 +69,6 @@ end-struct clause%
     \ < l2 < ... < ln
     ." [ " show-clause' ." ]"
     drop ;
-
-: merge-clauses' ( clause1 clause2 -- clause ) recursive
-    \ See merge-clauses.
-    { clause1 clause2 } clause2 0= IF
-        clause1
-    ELSE
-        clause2 clause-literal @ clause1 insert-literal
-        clause2 clause-next @
-        merge-clauses'
-    ENDIF ;
-
-: merge-clauses { clause1 clause2 -- clause }
-    \ Merges two clauses.
-    \
-    \ This merge runs in time O(n1*n2) where n1, n2 are the sizes of
-    \ clauses clause1 and clause2, respectively.
-    clause1 copy-clause clause2 merge-clauses' ;
 		
 : fast-merge' recursive { result clause1 clause2 -- } 
 	clause1 0= IF
