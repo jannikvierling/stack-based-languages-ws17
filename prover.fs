@@ -1,4 +1,5 @@
-0 constant input
+require clause.fs
+require clauselist.fs
 
 \ Holds the address of the seen set.
 variable seen

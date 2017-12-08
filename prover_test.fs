@@ -1,3 +1,6 @@
+require clause.fs
+require prover.fs
+require util.fs
 
 -1 0 insert-literal
 dup is-not-seen .
