@@ -1,6 +1,5 @@
-require helpers.fs
-require llclause.fs
-require resolution.fs
+require util.fs
+require clause.fs
 
 \ Test: clause-size
 

@@ -14,3 +14,11 @@ end-struct list%
 
 : list-pop ( list1 -- list1 list2 )
     dup list-next @ ;
+
+: list-show ( end list delim show-node start -- )
+    emit { delim show-node  -- } delim emit
+    BEGIN dup 0<> WHILE
+            dup show-node execute delim emit
+            list-next @
+    REPEAT drop emit ;
+    

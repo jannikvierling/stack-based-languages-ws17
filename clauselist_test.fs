@@ -1,3 +1,8 @@
+require list.fs
+require clause.fs
+require util.fs
+require clauselist.fs
+
 \ Tests the lists implemented in list.fs and provides some usage
 \ examples.
 
@@ -79,9 +84,7 @@ clauselist-clause @
 1 2 3 0 3 times insert-literal
 clauses-equal .
 
-
 \ Test: contains-clause.
-\ Todo implement tests
 
 \ (1) Contained clause should be found.
 
@@ -98,5 +101,11 @@ clauses-equal .
 2 3 0 2 times insert-literal swap
 contains-clause invert .
 
+\ Test: show-clauselist
+
+-1 2 -3 -5 4 6 10 0 7 times insert-literal 
+ 1 0 1 times insert-literal 
+0 2 times append-if-new
+show-clauselist
 
 

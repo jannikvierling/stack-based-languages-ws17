@@ -27,3 +27,10 @@ end-struct clauselist%
 
 : contains-clause ( clause* list<clause*> -- f )
     { clause list } ['] clauselist-clause ['] clauses-equal clause list list-search ;
+
+: newline 140201674271498 ;
+
+: show' ( clauselist -- ) clauselist-clause @ show-clause ;
+
+: show-clauselist ( clauselist -- )
+    { list } [Char] } list newline ['] show' [Char] { list-show ;

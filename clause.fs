@@ -54,21 +54,11 @@ end-struct clause%
                 clause
             ENDIF ENDIF ENDIF ;
 
-: show-clause' ( clause1 -- ) recursive
-    \ See show-clause.
-    dup 0<> IF
-        dup
-        clause-literal @ dec.
-        clause-next @ show-clause'
-    ENDIF ;
+: show-literal ( clause -- ) clause-literal @ 1 .r ;
 
 : show-clause ( clause -- )
     \ Prints a clause.
-    \
-    \ The clause is displayed in the format [ l1 l2 ... ln ], where l1
-    \ < l2 < ... < ln
-    ." [ " show-clause' ." ]"
-    drop ;
+    { clause } [Char] ] clause bl ['] show-literal [Char] [ list-show ;
 		
 : fast-merge' recursive { result clause1 clause2 -- } 
 	clause1 0= IF
@@ -77,9 +67,6 @@ end-struct clause%
 		clause2 0= IF
 			clause1 copy-clause result clause-next !
 		ELSE
-			\ Almost identical parts of code repeated three times
-			\ Could be a lot shorter with smarter usage of IF but
-			\ also a lot less readable
 			clause1 clause-literal @ clause2 clause-literal @ literal-equal IF
 				clause% %allot
 				0 over clause-next !	
@@ -114,7 +101,11 @@ end-struct clause%
 	0 over clause-literal !
 	dup	clause1 clause2 fast-merge'
 	clause-next @ ; \ todo: free the dummy element
-	
+
+: merge-clauses ( clause1 clause2 -- clause )
+    fast-merge ;
+    
+
 : clauses-equal ( clause1 clause2 -- f ) recursive
     \ Compares two clauses for equality.
     \
