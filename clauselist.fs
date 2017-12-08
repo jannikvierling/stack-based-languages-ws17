@@ -5,7 +5,7 @@ list%
 end-struct clauselist%
 
 : pop-clause ( list<clause*> -- list<clause*> clause* )
-    list-pop swap clauselist-clause ;
+    list-pop swap clauselist-clause @ ;
 
 : new-clause-list-node { clause next -- list }
     clauselist% %alloc
