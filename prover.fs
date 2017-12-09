@@ -78,7 +78,7 @@ variable working
             list-next @
     REPEAT drop ;
 
-: refute ( -- )
+: refute' ( -- )
     \ Tries to refute the clauses in the working set.
     \
     \ After the algorithm terminates (seen; working) represents a
@@ -89,3 +89,22 @@ variable working
             process-clause
     REPEAT ;
 
+: status ( -- status )
+    \ Determines the solver's current status.
+    \ status - 0 (UNSAT), 1 (SAT), -1 (RUNNING)
+    working-empty IF 1 exit ENDIF
+    working-box IF 0 exit ENDIF
+    -1 ;
+
+: refute ( input -- seen working status )
+    working ! 0 seen !
+    refute'
+    seen @ working @ status ;
+
+: main ( input -- )
+    refute { sc wc status } cr
+    ." SEEN"     cr sc show-clauselist cr cr
+    ." WORKING " cr wc show-clauselist cr cr
+    status 0 = IF ." UNSAT" cr exit ENDIF
+    status 1 = IF ." SAT"   cr exit ENDIF ;
+    

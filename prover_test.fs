@@ -14,6 +14,10 @@ dup is-not-seen .
 -3 0 insert-literal
 dup is-not-seen .
 
-4 dispatch-new
+\ Irrelevant clause (first four clauses are unsat)
+-1 -2 2 3 1 0 5 times insert-literal
 
-working @ list-length 4 = .
+0 5 times append-if-new
+
+\ status 
+main
