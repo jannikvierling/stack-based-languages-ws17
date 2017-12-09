@@ -1,5 +1,5 @@
-require list.fs
 require literal.fs
+require list.fs
 
 list%
     cell% field clause-literal
@@ -42,11 +42,11 @@ end-struct clause%
         clause% %allot
         0 over clause-next !
         literal over clause-literal !
-    ELSE clause clause-literal @ literal literal-greater IF
+    ELSE clause clause-literal @ literal > IF
             clause% %allot dup dup
             clause swap clause-next !
             literal swap clause-literal !
-        ELSE clause clause-literal @ literal literal-less IF
+        ELSE clause clause-literal @ literal < IF
                 literal clause clause-next @ insert-literal
                 clause clause-next !
                 clause
@@ -54,12 +54,12 @@ end-struct clause%
                 clause
             ENDIF ENDIF ENDIF ;
 
-: show-literal ( clause -- ) clause-literal @ 1 .r ;
+: show-clause' ( clause -- ) clause-literal @ 1 .r ;
 
 : show-clause ( clause -- )
     \ Prints a clause.
-    { clause } [Char] ] clause bl ['] show-literal [Char] [ list-show ;
-		
+    { clause } [Char] ] clause bl ['] show-clause' [Char] [ list-show ;
+
 : fast-merge' recursive { result clause1 clause2 -- } 
 	clause1 0= IF
 		clause2 copy-clause result clause-next !
@@ -67,6 +67,9 @@ end-struct clause%
 		clause2 0= IF
 			clause1 copy-clause result clause-next !
 		ELSE
+			\ Almost identical parts of code repeated three times
+			\ Could be a lot shorter with smarter usage of IF but
+			\ also a lot less readable
 			clause1 clause-literal @ clause2 clause-literal @ literal-equal IF
 				clause% %allot
 				0 over clause-next !	
@@ -91,20 +94,13 @@ end-struct clause%
 		ENDIF
 	ENDIF ;
 
+\ Create a dummy first element to work with, then drop it
 : fast-merge { clause1 clause2 -- clause }
-    \ Merges two clauses.
-    \
-    \ This clause merge runs in O(n1 + n2) where n1, n2 are the sizes of
-    \ clause1 and clause2, respectively.
-	clause% %allot \ create a dummy first element to work with, then drop it
+	clause% %allot
 	0 over clause-next !
 	0 over clause-literal !
 	dup	clause1 clause2 fast-merge'
-	clause-next @ ; \ todo: free the dummy element
-
-: merge-clauses ( clause1 clause2 -- clause )
-    fast-merge ;
-    
+	clause-next @ ;
 
 : clauses-equal ( clause1 clause2 -- f ) recursive
     \ Compares two clauses for equality.
