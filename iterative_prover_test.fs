@@ -1,6 +1,6 @@
 require clause.fs
-require prover.fs
 require util.fs
+require iterative_prover.fs
 
 variable trivial
 
