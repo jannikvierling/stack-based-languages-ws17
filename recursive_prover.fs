@@ -39,7 +39,17 @@ require clauseset.fs
 		set set-size merge-sets-from-stack
 	ENDIF ;
 
-100 constant max-depth
+\ Set to negative value for unlimited depth
+variable max-depth'
+100 max-depth' !
+: MAX-DEPTH max-depth' @ ;
+: set-max-depth ( new-depth -- ) max-depth' ! ;
+
+variable verbose'
+FALSE verbose' !
+: IS-VERBOSE verbose' @ ;
+: verbose TRUE verbose' ! ;
+: silent FALSE verbose' ! ;
 
 : see-clause { clause working seen -- working' seen' }
     clause seen resolve-with-set
@@ -48,26 +58,42 @@ require clauseset.fs
     clause seen insert-clause ;
 	
 : is-sat' recursive { working seen depth -- working' seen' flag }
+
+	IS-VERBOSE IF
+	cr
+	." -----------------------"			cr
+	." Iteration: "  depth .			cr
+	." Seen: "		seen	show-set	cr
+	." Working: "	working	show-set	ENDIF
+
     working 0= IF
         working seen -1 EXIT ENDIF
 	0 working contains-clause IF
         working seen 0 EXIT ENDIF
-    depth max-depth >= IF
+    depth MAX-DEPTH = IF
         working seen 1 EXIT ENDIF
     working set-clause @ working seen see-clause
     depth 1+  is-sat' ;
 	
 : is-sat ( set -- working seen flag )
     \ Refutes the given clause set.
-    \ flag :0 if UNSAT, -1 if SAT, 1 recusion depth exceeded
+    \ flag :0 if UNSAT, -1 if SAT, 1 recursion depth exceeded
     0 0 is-sat' ;
 
 : refute ( set -- )
-    is-sat cr
-    ." Seen:"    swap cr show-set cr
-    ." Working:" swap cr show-set cr
-    dup  0 = IF ." UNSAT" EXIT ENDIF
-    dup -1 = IF ." SAT"   EXIT ENDIF
+    is-sat
+
+	IS-VERBOSE IF
+	cr
+	." ======================="			cr
+    ." Seen:"    swap show-set 			cr
+    ." Working:" swap show-set
+	ELSE swap drop swap drop ENDIF
+	
+	cr
+    dup  0 = IF ." UNSAT" ENDIF
+    dup -1 = IF ." SAT"   ENDIF
+    dup  1 = IF ." EXCEEDED RECURSION DEPTH" ENDIF
     drop ;
 
     
