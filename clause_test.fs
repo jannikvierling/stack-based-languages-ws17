@@ -83,17 +83,17 @@ clause-next @ 0= .
 
 1 0 insert-literal dup
 0
-merge-clauses <> .
+fast-merge <> .
 
 \ (2) Merged clause should not contain duplicates.
 
-1 0 insert-literal 1 0 insert-literal merge-clauses
+1 0 insert-literal 1 0 insert-literal fast-merge
 clause-next @ 0 = .
 
 \ (3) Merged clause should contain all literals from both clauses.
 \ (4) Merged clause should be ordered.
 
-1 0 insert-literal 2 0 insert-literal merge-clauses dup
+1 0 insert-literal 2 0 insert-literal fast-merge dup
 clause-literal @ 1 = .
 clause-next @ clause-literal @ 2 = .
 
