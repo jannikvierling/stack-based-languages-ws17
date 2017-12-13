@@ -48,20 +48,14 @@ require clauseset.fs
     clause seen insert-clause ;
 	
 : is-sat' recursive { working seen depth -- working' seen' flag }
-	working 0= IF
-		working seen -1
-	ELSE
-		0 working contains-clause IF
-			working seen 0
-		ELSE
-			depth max-depth >= IF
-				working seen 1
-			ELSE
-				working set-clause @ working seen see-clause
-				depth 1+  is-sat'
-			ENDIF
-		ENDIF
-    ENDIF ;
+    working 0= IF
+        working seen -1 EXIT ENDIF
+	0 working contains-clause IF
+        working seen 0 EXIT ENDIF
+    depth max-depth >= IF
+        working seen 1 EXIT ENDIF
+    working set-clause @ working seen see-clause
+    depth 1+  is-sat' ;
 	
 : is-sat ( set -- working seen flag )
     \ Refutes the given clause set.
@@ -72,8 +66,8 @@ require clauseset.fs
     is-sat cr
     ." Seen:"    swap cr show-set cr
     ." Working:" swap cr show-set cr
-    dup  0 = IF ." UNSAT" exit ENDIF
-    dup -1 = IF ." SAT"   exit ENDIF
+    dup  0 = IF ." UNSAT" EXIT ENDIF
+    dup -1 = IF ." SAT"   EXIT ENDIF
     drop ;
 
     
