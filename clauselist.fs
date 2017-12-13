@@ -1,4 +1,6 @@
+
 require list.fs
+require clause.fs
 
 list%
     cell% field clauselist-clause
@@ -28,9 +30,7 @@ end-struct clauselist%
 : contains-clause ( clause* list<clause*> -- f )
     { clause list } ['] clauselist-clause ['] clauses-equal clause list list-search ;
 
-: newline 140201674271498 ;
-
 : show' ( clauselist -- ) clauselist-clause @ show-clause ;
 
 : show-clauselist ( clauselist -- )
-    { list } [Char] } list newline ['] show' [Char] { list-show ;
+    { list } [Char] } list 10 ['] show' [Char] { list-show ;
