@@ -92,8 +92,8 @@ variable working
 : status ( -- status )
     \ Determines the solver's current status.
     \ status - 0 (UNSAT), 1 (SAT), -1 (RUNNING)
-    working-empty IF 1 exit ENDIF
-    working-box IF 0 exit ENDIF
+    working-empty IF 1 EXIT ENDIF
+    working-box IF 0 EXIT ENDIF
     -1 ;
 
 : refute ( input -- seen working status )
@@ -105,6 +105,6 @@ variable working
     refute { sc wc status } cr
     ." SEEN"     cr sc show-clauselist cr cr
     ." WORKING " cr wc show-clauselist cr cr
-    status 0 = IF ." UNSAT" cr exit ENDIF
-    status 1 = IF ." SAT"   cr exit ENDIF ;
+    status 0 = IF ." UNSAT" cr EXIT ENDIF
+    status 1 = IF ." SAT"   cr EXIT ENDIF ;
     

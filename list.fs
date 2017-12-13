@@ -4,7 +4,7 @@ end-struct list%
 
 : list-search { selector comparator val list -- f }
     list BEGIN dup 0<> WHILE dup selector execute @ val swap comparator execute IF
-                drop true exit
+                drop true EXIT
             ENDIF list-next @ REPEAT drop false ;
 
 : list-length ( list -- n)
