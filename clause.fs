@@ -70,14 +70,14 @@ end-struct clause%
 			\ Almost identical parts of code repeated three times
 			\ Could be a lot shorter with smarter usage of IF but
 			\ also a lot less readable
-			clause1 clause-literal @ clause2 clause-literal @ literal-equal IF
+			clause1 clause-literal @ clause2 clause-literal @ = IF
 				clause% %allot
 				0 over clause-next !	
 				clause1 clause-literal @ over clause-literal !
 				dup result clause-next !
 				clause1 clause-next @ clause2 clause-next @ fast-merge'
 			ELSE
-				clause1 clause-literal @ clause2 clause-literal @ literal-less IF
+				clause1 clause-literal @ clause2 clause-literal @ < IF
 					clause% %allot
 					0 over clause-next !	
 					clause1 clause-literal @ over clause-literal !
