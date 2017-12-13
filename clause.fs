@@ -5,6 +5,12 @@ list%
     cell% field clause-literal
 end-struct clause%
 
+: GUARD ( Compilation: -- orig; Run-time: f -- )
+    POSTPONE IF ; immediate
+
+: END ( Compilation: orig -- )
+    POSTPONE EXIT POSTPONE ENDIF ; immediate
+
 : clause-next list-next ;
 
 : clause-size list-length ;
@@ -21,38 +27,34 @@ end-struct clause%
 
 : remove-literal ( literal clause1 -- clause2 ) recursive
     \ Removes a literal from a clause.
-    { literal clause } clause 0= IF
-        0
-    ELSE
-        clause clause-literal @ literal = IF
-            clause clause-next @
-        ELSE
-            literal clause clause-next @ remove-literal
-            clause clause-next !
-            clause
-        ENDIF
-    ENDIF ;
+    { literal clause }
+    clause 0= GUARD
+        0 END
+    clause clause-literal @ literal = GUARD
+        clause clause-next @ END
+    literal clause clause-next @ remove-literal
+    clause clause-next !
+    clause ;
 
 : insert-literal ( literal clause1 -- clause2 ) recursive
     \ Inserts a literal in a clause.
     \
     \ The "literal" is inserted into "clause1" only if this literal is
     \ not yet present. The resulting clause "clause2" is ordered.
-    { literal clause } clause 0= IF
+    { literal clause }
+    clause 0= GUARD
         clause% %allot
         0 over clause-next !
-        literal over clause-literal !
-    ELSE clause clause-literal @ literal > IF
-            clause% %allot dup dup
-            clause swap clause-next !
-            literal swap clause-literal !
-        ELSE clause clause-literal @ literal < IF
-                literal clause clause-next @ insert-literal
-                clause clause-next !
-                clause
-            ELSE
-                clause
-            ENDIF ENDIF ENDIF ;
+        literal over clause-literal ! END
+    clause clause-literal @ literal > GUARD
+        clause% %allot dup dup
+        clause swap clause-next !
+        literal swap clause-literal ! END
+    clause clause-literal @ literal < GUARD
+        literal clause clause-next @ insert-literal
+        clause clause-next !
+        clause END        
+    clause ;
 
 : show-clause' ( clause -- ) clause-literal @ 1 .r ;
 
@@ -61,38 +63,27 @@ end-struct clause%
     { clause } [Char] ] clause bl ['] show-clause' [Char] [ list-show ;
 
 : fast-merge' recursive { result clause1 clause2 -- } 
-	clause1 0= IF
-		clause2 copy-clause result clause-next !
-	ELSE
-		clause2 0= IF
-			clause1 copy-clause result clause-next !
-		ELSE
-			\ Almost identical parts of code repeated three times
-			\ Could be a lot shorter with smarter usage of IF but
-			\ also a lot less readable
-			clause1 clause-literal @ clause2 clause-literal @ = IF
-				clause% %allot
-				0 over clause-next !	
-				clause1 clause-literal @ over clause-literal !
-				dup result clause-next !
-				clause1 clause-next @ clause2 clause-next @ fast-merge'
-			ELSE
-				clause1 clause-literal @ clause2 clause-literal @ < IF
-					clause% %allot
-					0 over clause-next !	
-					clause1 clause-literal @ over clause-literal !
-					dup result clause-next !
-					clause1 clause-next @ clause2 fast-merge'
-				ELSE
-					clause% %allot
-					0 over clause-next !	
-					clause2 clause-literal @ over clause-literal !
-					dup result clause-next !
-					clause1 clause2 clause-next @ fast-merge'
-				ENDIF
-			ENDIF
-		ENDIF
-	ENDIF ;
+	clause1 0= GUARD
+		clause2 copy-clause result clause-next ! END
+    clause2 0= GUARD
+        clause1 copy-clause result clause-next ! END
+    clause1 clause-literal @ clause2 clause-literal @ = GUARD
+        clause% %allot
+        0 over clause-next !	
+        clause1 clause-literal @ over clause-literal !
+        dup result clause-next !
+        clause1 clause-next @ clause2 clause-next @ fast-merge' END
+    clause1 clause-literal @ clause2 clause-literal @ < GUARD
+        clause% %allot
+        0 over clause-next !	
+        clause1 clause-literal @ over clause-literal !
+        dup result clause-next !
+        clause1 clause-next @ clause2 fast-merge' END
+    clause% %allot
+    0 over clause-next !	
+    clause2 clause-literal @ over clause-literal !
+    dup result clause-next !
+    clause1 clause2 clause-next @ fast-merge' ;
 
 \ Create a dummy first element to work with, then drop it
 : fast-merge { clause1 clause2 -- clause }
@@ -108,16 +99,13 @@ end-struct clause%
     \ "clause1", "clause2": Adresses to clauses.
     \ "f": true if the clauses are equal, false otherwise.
     { clause1 clause2 }
-    clause1 0= IF
-        clause2 0= IF true ELSE false ENDIF
-    ELSE
-        clause2 0= IF false
-        ELSE
-            clause1 clause-literal @ clause2 clause-literal @ =
-            clause1 clause-next @ clause2 clause-next @
-            clauses-equal and
-        ENDIF
-    ENDIF ;
+    clause1 0= GUARD
+        clause2 0= IF true ELSE false ENDIF END
+    clause2 0= GUARD
+        false END
+    clause1 clause-literal @ clause2 clause-literal @ =
+    clause1 clause-next @ clause2 clause-next @
+    clauses-equal and ;
 
 : contains-literal ( literal clause -- f)
     ['] clause-literal ['] = 2swap list-search ;
