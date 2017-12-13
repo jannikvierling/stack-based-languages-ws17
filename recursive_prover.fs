@@ -1,5 +1,6 @@
 require literal.fs
 require clause.fs
+require clauseset.fs
 
 : make-set-from-stack' recursive ( clause_1 ... clause_n n result -- set )
 	swap
@@ -41,34 +42,38 @@ require clause.fs
 100 constant max-depth
 
 : see-clause { clause working seen -- working' seen' }
-	clause seen resolve-with-set
+    clause seen resolve-with-set
 	seen swap substract-set
 	working merge-sets clause swap remove-clause
-	clause seen insert-clause
-	;
+    clause seen insert-clause ;
 	
-\ 0 ... not satisfiable
-\ -1 ... satisfiable
-\ 1 ... exceeded maximum recursion depth
-
-: is-sat' recursive { working seen depth -- flag }
-\	cr cr ." iteration: " depth .
-\	cr ." working: " working show-set
-\	cr ." seen: " seen show-set
+: is-sat' recursive { working seen depth -- working' seen' flag }
 	working 0= IF
-		-1
+		working seen -1
 	ELSE
 		0 working contains-clause IF
-			0
+			working seen 0
 		ELSE
 			depth max-depth >= IF
-				1
+				working seen 1
 			ELSE
 				working set-clause @ working seen see-clause
 				depth 1+  is-sat'
 			ENDIF
 		ENDIF
-	ENDIF
-	;
+    ENDIF ;
 	
-: is-sat ( set -- flag ) 0 0 is-sat' ;
+: is-sat ( set -- working seen flag )
+    \ Refutes the given clause set.
+    \ flag :0 if UNSAT, -1 if SAT, 1 recusion depth exceeded
+    0 0 is-sat' ;
+
+: refute ( set -- )
+    is-sat cr
+    ." Seen:"    swap cr show-set cr
+    ." Working:" swap cr show-set cr
+    dup  0 = IF ." UNSAT" exit ENDIF
+    dup -1 = IF ." SAT"   exit ENDIF
+    drop ;
+
+    
