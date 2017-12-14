@@ -9,7 +9,7 @@ require parser.fs
 begin-dimacs
 
 1 2			0
--1 2		0
+-1 2			0
 -2 			0
 
 3 clauses
@@ -25,7 +25,7 @@ constant very-simple
 begin-dimacs
 
 1 2			0
--1 2		0
+-1 2			0
 2 3			0
 
 3 clauses
@@ -35,10 +35,26 @@ constant very-simple2
 
 \ very-simple2 refute
 
+
+\ ----------------------------------------------
+
+begin-dimacs
+
+1 2 -3			0
+-2			0
+-1			0
+3			0
+
+4 clauses
+
+end-dimacs
+constant pres-example
+
 \ ----------------------------------------------
 
 1 2 3 0		3 times insert-literal constant c0
 -1 -2 4 0	3 times insert-literal constant c1
+
 
 \ c0 c1 resolve-all
 \ make-set-from-stack
