@@ -1,0 +1,112 @@
+\documentclass{beamer}
+
+\usetheme{Szeged}
+
+\usepackage[utf8]{inputenc}
+\usepackage{bussproofs}
+\usepackage[]{algorithm2e}
+
+\author{Jannik Vierling \and Thomas Baumhauer}
+\title{Stackbasierte Sprachen -- WS 2017}
+\subtitle{Aussagenlogischer Resolutionsbeweiser}
+
+\begin{document}
+
+\frame{
+  \maketitle
+}
+
+\section{Resolutionsbeweisen}
+
+\frame{
+  \frametitle{Problemstellung}
+
+  Automatisches Beweisen: Ist eine gegebene Formel gültig? Gibt es einen Beweis? \bigskip \\
+
+  {\color{blue}Problem} UNSAT \\
+  {\color{blue}Instanz}: Aussagenlogische Formel $\varphi$ in CNF. \\
+  {\color{blue}Frage}: Ist die Formel $\varphi$ unerfüllbar? \\
+  {\color{blue}Ausgabe}: Beweis für die unerfüllbarkeit \bigskip \\
+
+  $\leadsto$ Komplement von SAT  $\Rightarrow$ UNSAT ist $\mathsf{co}\mathbf{NP}$-vollständig \\
+  $\leadsto$ Nicht-effizient lösbar (?)
+}
+
+\frame{
+  \frametitle{Das Resolutionsprinzip}
+  \begin{center}
+  CNF $\leftrightsquigarrow$ Menge atomarer Sequenten
+  \end{center}
+  {\small
+  \begin{definition}[Atomarer Sequent]
+  \[
+    a_1, \dots, a_n \rightarrow b_1, \dots, b_m
+  \]
+  \end{definition}
+  \begin{definition}[Resolution]
+  \begin{prooftree}
+    \AxiomC{$\Gamma \rightarrow \Delta, A$}
+    \AxiomC{$A, \Pi \rightarrow \Lambda$}
+    \BinaryInfC{$\Gamma, \Pi \rightarrow \Delta, \Lambda$}
+  \end{prooftree}
+\end{definition}
+}
+\begin{center}
+Resolutionsbeweisen $\leftrightsquigarrow$ Erschöpfende Resolution
+\end{center}
+}
+
+\frame{
+  \frametitle{Ein Einfaches Beispiel}
+  \begin{gather*}
+    (A \vee B \vee \neg C) \wedge \neg B \wedge \neg A \wedge C \\ \\
+    \{ C \rightarrow A, B \quad ; \quad B \rightarrow \quad ; \quad A \rightarrow \quad ; \quad \rightarrow C \}
+  \end{gather*}
+  \begin{prooftree}
+    \AxiomC{$\rightarrow C$}
+
+    \AxiomC{$C \rightarrow A, B$}
+    \AxiomC{$B \rightarrow$}
+    \BinaryInfC{$C \rightarrow A$}
+
+    \AxiomC{$A \rightarrow$}
+    
+    \BinaryInfC{$C \rightarrow$}
+
+    \BinaryInfC{$\phantom{C} \rightarrow$}
+  \end{prooftree} \medskip
+  {\color{blue}$\leadsto$} Die Formel ist unerfüllbar
+}
+
+\section{Implementierung}
+
+\frame{
+  \frametitle{Algorithmus}
+  \begin{algorithm}[H]
+    \KwData{Formel $\varphi$ in CNF}
+ \KwResult{SAT oder UNSAT und Resolutionsdeduktion}
+ $W = \varphi$\;
+ $S = \varnothing$\;
+ $N = \varnothing$\;
+ \While{$\rightarrow \notin W$ and $W \neq \varnothing$}{
+  wähle $C \in W$\;
+  $W = W \setminus \{ C \}$\;
+  $S = S \cup \{ C \}$\;
+  $N = \mathrm{Res}(C, S) \setminus (W \cup S)$\;
+  $W = W \cup N$\;
+ }
+\end{algorithm}
+}
+
+\frame{
+  \frametitle{Besonderheiten}
+  \begin{itemize}
+    \item Übergabe variabler Anzahl von Argumenten.
+    \item Konkatenativer Programmierstil.
+    \item Maßgeschneiderte Syntax für Problemeingabe.
+    \item Eigene Kontrollstrukturen.
+    \item Generische Wörter.
+  \end{itemize}
+}
+
+\end{document}
