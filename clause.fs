@@ -46,11 +46,11 @@ end-struct clause%
         clause% %allot
         0 over clause-next !
         literal over clause-literal ! END
-    clause clause-literal @ literal > GUARD
+    clause clause-literal @ literal literal-greater GUARD
         clause% %allot dup dup
         clause swap clause-next !
         literal swap clause-literal ! END
-    clause clause-literal @ literal < GUARD
+    clause clause-literal @ literal literal-less GUARD
         literal clause clause-next @ insert-literal
         clause clause-next !
         clause END        
@@ -62,35 +62,28 @@ end-struct clause%
     \ Prints a clause.
     { clause } [Char] ] clause bl ['] show-clause' [Char] [ list-show ;
 
+: new-clause-node ( literal next -- node )
+    clause% %allot tuck clause-next ! tuck clause-literal ! ;
+
+: fm-choose-args { clause1 clause2 -- c1' c2' l }
+    clause1 clause-literal @ clause2 clause-literal @ literal-equal GUARD
+         clause1 clause-next @ clause2 clause-next @ clause1 clause-literal @ END
+    clause1 clause-literal @ clause2 clause-literal @ literal-less GUARD
+         clause1 clause-next @ clause2 clause1 clause-literal @ END
+    clause1 clause2 clause-next @ clause2 clause-literal @ ;
+
 : fast-merge' recursive { result clause1 clause2 -- } 
 	clause1 0= GUARD
 		clause2 copy-clause result clause-next ! END
     clause2 0= GUARD
         clause1 copy-clause result clause-next ! END
-    clause1 clause-literal @ clause2 clause-literal @ = GUARD
-        clause% %allot
-        0 over clause-next !	
-        clause1 clause-literal @ over clause-literal !
-        dup result clause-next !
-        clause1 clause-next @ clause2 clause-next @ fast-merge' END
-    clause1 clause-literal @ clause2 clause-literal @ < GUARD
-        clause% %allot
-        0 over clause-next !	
-        clause1 clause-literal @ over clause-literal !
-        dup result clause-next !
-        clause1 clause-next @ clause2 fast-merge' END
-    clause% %allot
-    0 over clause-next !	
-    clause2 clause-literal @ over clause-literal !
-    dup result clause-next !
-    clause1 clause2 clause-next @ fast-merge' ;
+    clause1 clause2 fm-choose-args
+    0 new-clause-node dup result clause-next ! -rot
+    fast-merge' ;
 
 \ Create a dummy first element to work with, then drop it
-: fast-merge { clause1 clause2 -- clause }
-	clause% %allot
-	0 over clause-next !
-	0 over clause-literal !
-	dup	clause1 clause2 fast-merge'
+: fast-merge ( clause1 clause2 -- clause )
+    0 0 new-clause-node dup 2swap fast-merge'
 	clause-next @ ;
 
 : clauses-equal ( clause1 clause2 -- f ) recursive
