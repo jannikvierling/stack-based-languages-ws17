@@ -15,15 +15,17 @@ end-struct clause%
 
 : clause-size list-length ;
 
+: new-clause-node ( literal next -- node )
+    \ Creates a new clause node.
+    clause% %allot tuck clause-next ! tuck clause-literal ! ;
+
 : copy-clause ( clause1 -- clause2 ) recursive
     \ Copies a clause.
-    { clause } clause 0= IF
-        0
-    ELSE
-        clause clause-next @ copy-clause
-        clause% %allot dup rot rot clause-next !
-        clause clause-literal @ over clause-literal !
-    ENDIF ;
+    { clause } clause 0= GUARD
+        0 END
+    clause clause-literal @
+    clause clause-next @ copy-clause
+    new-clause-node ;
 
 : remove-literal ( literal clause1 -- clause2 ) recursive
     \ Removes a literal from a clause.
@@ -37,33 +39,26 @@ end-struct clause%
     clause ;
 
 : insert-literal ( literal clause1 -- clause2 ) recursive
-    \ Inserts a literal in a clause.
+    \ Inserts a literal in a clause if it does not occur.
     \
-    \ The "literal" is inserted into "clause1" only if this literal is
-    \ not yet present. The resulting clause "clause2" is ordered.
+    \ The resulting clause "clause2" is ordered.
     { literal clause }
     clause 0= GUARD
-        clause% %allot
-        0 over clause-next !
-        literal over clause-literal ! END
+        literal 0 new-clause-node END
     clause clause-literal @ literal literal-greater GUARD
-        clause% %allot dup dup
-        clause swap clause-next !
-        literal swap clause-literal ! END
+        literal clause new-clause-node END
     clause clause-literal @ literal literal-less GUARD
         literal clause clause-next @ insert-literal
         clause clause-next !
         clause END        
     clause ;
 
-: show-clause' ( clause -- ) clause-literal @ 1 .r ;
+: show-clause' ( clause -- )
+    clause-literal @ 1 .r ;
 
 : show-clause ( clause -- )
     \ Prints a clause.
     { clause } [Char] ] clause bl ['] show-clause' [Char] [ list-show ;
-
-: new-clause-node ( literal next -- node )
-    clause% %allot tuck clause-next ! tuck clause-literal ! ;
 
 : fm-choose-args { clause1 clause2 -- c1' c2' l }
     clause1 clause-literal @ clause2 clause-literal @ literal-equal GUARD
