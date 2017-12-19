@@ -101,11 +101,45 @@ clauses-equal .
 2 3 0 2 times insert-literal swap
 contains-clause invert .
 
+\ Test: insert-clause
+
+1 0 1 times insert-literal
+0
+1 2 3 0 3 times insert-literal 
+1 2 3 4 5 0 5 times insert-literal
+4 0 insert-literal
+1 2 0 2 times insert-literal
+0
+3 0 insert-literal
+0 8 times insert-clause
+
+
+dup list-length 7 = .
+
+dup clauselist-clause @ list-length 0= .
+list-next @
+
+dup clauselist-clause @ list-length 1 = .
+list-next @
+
+dup clauselist-clause @ list-length 1 = .
+list-next @
+
+dup clauselist-clause @ list-length 1 = .
+list-next @
+
+dup clauselist-clause @ list-length 2 = .
+list-next @
+
+dup clauselist-clause @ list-length 3 = .
+list-next @
+
+dup clauselist-clause @ list-length 5 = .
+list-next @ 0= .
+
 \ Test: show-clauselist
 
 -1 2 -3 -5 4 6 10 0 7 times insert-literal 
  1 0 1 times insert-literal 
 0 2 times append-if-new
 show-clauselist
-
-

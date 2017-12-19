@@ -62,7 +62,7 @@ variable working
     \ "clause_1 ... clause_n" The clauses to be inserted to working.
     \ "n" The number of clauses to consider.
     0 U+DO
-        dup is-not-seen IF dup working @ append-if-new working ! ENDIF drop
+        dup is-not-seen IF dup working @ insert-clause working ! ENDIF drop
     LOOP ;
 
 : process-clause ( clause -- )
