@@ -12,7 +12,7 @@ end-struct clauselist%
 : new-clause-list-node { clause next -- list }
     clauselist% %alloc
     dup clause swap clauselist-clause !
-    dup 0 swap list-next ! ;
+    dup next swap list-next ! ;
 
 : append-if-new ( clause clauselist -- clauselist )
     dup 0= GUARD
