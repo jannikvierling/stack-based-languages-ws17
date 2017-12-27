@@ -2,6 +2,14 @@ struct
     cell% field list-next
 end-struct list%
 
+: last-node ( head -- last )
+    BEGIN dup list-next @ 0<> WHILE
+            list-next @
+    REPEAT ;
+    
+: is_emptylist? ( head -- f )
+    0= ;
+
 : list-search { selector comparator val list -- f }
     list BEGIN dup 0<> WHILE dup selector execute @ val swap comparator execute IF
                 drop true EXIT

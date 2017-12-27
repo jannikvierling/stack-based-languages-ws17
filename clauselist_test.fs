@@ -1,6 +1,6 @@
+require util.fs
 require list.fs
 require clause.fs
-require util.fs
 require clauselist.fs
 
 \ Tests the lists implemented in list.fs and provides some usage
