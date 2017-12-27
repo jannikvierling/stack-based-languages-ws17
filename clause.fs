@@ -119,3 +119,37 @@ end-struct clause%
             ENDIF
             clause-next @
     REPEAT drop ;
+
+: subsumes? ( c_2 c_1 -- f )
+    \ Checks if a given clauses subsumes another clause.
+    \
+    \ Returns true if c_2 subsumes c_1, false otherwise.
+    { c_1 } BEGIN dup 0<> WHILE
+            dup clause-literal @ c_1 contains-literal invert IF
+                drop false EXIT ENDIF
+            list-next @
+    REPEAT drop true ;
+
+1 2 3 4 5 6 0 6 times insert-literal
+1 4 5 0 3 times insert-literal
+subsumes? invert .
+
+1 4 5 0 3 times insert-literal
+1 2 3 4 5 6 0 6 times insert-literal
+subsumes? .
+
+1 0 insert-literal
+1 0 insert-literal
+subsumes? .
+
+0 0 subsumes? .
+
+-1 0 insert-literal
+1 0 insert-literal
+subsumes? invert .
+
+1 0 insert-literal
+-1 0 insert-literal
+subsumes? invert .
+
+

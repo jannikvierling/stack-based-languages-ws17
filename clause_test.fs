@@ -184,6 +184,30 @@ clauses-equal .
 -2 2 0 insert-literal insert-literal  ( expected clause )
 clauses-equal .
 
+\ Test: subsumption
+
+1 2 3 4 5 6 0 6 times insert-literal
+1 4 5 0 3 times insert-literal
+subsumes? invert .
+
+1 4 5 0 3 times insert-literal
+1 2 3 4 5 6 0 6 times insert-literal
+subsumes? .
+
+1 0 insert-literal
+1 0 insert-literal
+subsumes? .
+
+0 0 subsumes? .
+
+-1 0 insert-literal
+1 0 insert-literal
+subsumes? invert .
+
+1 0 insert-literal
+-1 0 insert-literal
+subsumes? invert .
+
 \ Test: show-clause.
 
 \ (1) Empty clause should show as [ ].
