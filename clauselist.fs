@@ -6,6 +6,12 @@ list%
     cell% field clauselist-clause
 end-struct clauselist%
 
+: clauselist.deallocator ( node -- )
+    clauselist-clause clause.free ;
+
+: clauselist.free ( clauselist -- )
+    ['] clauselist.deallocator free-list ;
+
 : contains-clause ( clause* list<clause*> -- f )
     \ Checks whether a clause occurs in a list.
     \

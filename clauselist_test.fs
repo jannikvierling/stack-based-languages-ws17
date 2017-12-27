@@ -11,9 +11,9 @@ require clauselist.fs
 \ (1) Constructing a list in reverse order
 
 0
-list% %allot
-list% %allot
-list% %allot
+list% %alloc
+list% %alloc
+list% %alloc
 
 dup constant head
 
@@ -51,8 +51,8 @@ list-search .
 
 \ (2) Nonempty list should have correct length.
 
-list% %allot
-list% %allot
+list% %alloc
+list% %alloc
 
 swap over list-next !
 dup 0 swap list-next @ list-next !

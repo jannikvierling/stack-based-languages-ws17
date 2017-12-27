@@ -11,13 +11,19 @@ end-struct clause%
 : END ( Compilation: orig -- )
     POSTPONE EXIT POSTPONE ENDIF ; immediate
 
+: clause.deallocator ( node -- )
+    drop ;
+
+: clause.free ( clause -- )
+    ['] clause.deallocator list.free ;
+
 : clause-next list-next ;
 
 : clause-size list-length ;
 
 : new-clause-node ( literal next -- node )
     \ Creates a new clause node.
-    clause% %allot tuck clause-next ! tuck clause-literal ! ;
+    clause% %alloc tuck clause-next ! tuck clause-literal ! ;
 
 : copy-clause ( clause1 -- clause2 ) recursive
     \ Copies a clause.
@@ -27,13 +33,19 @@ end-struct clause%
     clause clause-next @ copy-clause
     new-clause-node ;
 
+\ : clauselist.deallocator ( node -- )
+\     clauselist-clause clause.free ;
+
+\ : clauselist.free ( clauselist -- )
+\     ['] clauselist.deallocator free-list ;
+
 : remove-literal ( literal clause1 -- clause2 ) recursive
     \ Removes a literal from a clause.
     { literal clause }
     clause 0= GUARD
         0 END
     clause clause-literal @ literal = GUARD
-        clause clause-next @ END
+         clause clause-next @ clause list.free_node END
     literal clause clause-next @ remove-literal
     clause clause-next !
     clause ;
@@ -104,9 +116,9 @@ end-struct clause%
     \ "literal": The resolved upon literal; this is a literal of
     \ clause1 and its dual must appear in clause2.
     { literal clause1 clause2 }
-    literal clause1 copy-clause remove-literal
-    literal negate clause2 copy-clause remove-literal
-    fast-merge ; \ todo: free the copies
+    literal clause1 copy-clause remove-literal { c1 } c1
+    literal negate clause2 copy-clause remove-literal { c2 } c2
+    fast-merge c1 c2 clause.free clause.free ;
 
 : resolve-all ( clause1 clause2 -- res_1 ... res_n n )
     \ Resolves two clauses upon all resolvable literals.
