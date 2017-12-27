@@ -7,21 +7,44 @@ list%
 end-struct clause%
 
 : clause.deallocator ( node -- )
+    \ Frees the memory held by a clause node.
+    \
+    \ "node" The node whose memory is to be freed.
     drop ;
 
 : clause.free ( clause -- )
+    \ Frees a clause node
+    \
+    \ "clause" The node to be freed.
     ['] clause.deallocator list.free ;
 
-: clause.next list.next ;
+: clause.next ( clause -- clause + offset )
+    \ Clause next-accessor.
+    \
+    \ "clause" The clause whose next component is to be accessed.
+    \ Returns a the clause address to which the next-offset is added.
+    list.next ;
 
-: clause.size list.length ;
+: clause.size ( clause -- n )
+    \ Computes a given clause's size.
+    \
+    \ "clause" The clause whose size is to be computed.
+    \ "n" The given clause's size.
+    list.length ;
 
 : clause.new_node ( literal next -- node )
     \ Creates a new clause node.
+    \
+    \ "literal" The literal to be associated to the new node.
+    \ "next" The successor of the newly created node.
+    \ Return the address of the newly allocated node.
     clause% %alloc tuck clause.next ! tuck clause.literal ! ;
 
 : clause.copy ( clause1 -- clause2 ) recursive
     \ Copies a clause.
+    \
+    \ Creates a deep copy of the clause. Returns the address of the
+    \ copy.
     { clause } clause 0= GUARD
         0 END
     clause clause.literal @
@@ -30,6 +53,11 @@ end-struct clause%
 
 : clause.remove_literal ( literal clause1 -- clause2 ) recursive
     \ Removes a literal from a clause.
+    \
+    \ "literal" The literal that is to be removed from the clause.
+    \ "clause" The clause from which the literal is to be removed.
+    \ The clause's address might change. Returns the address of the
+    \ clause after removal of the literal.
     { literal clause }
     clause 0= GUARD
         0 END
@@ -42,7 +70,10 @@ end-struct clause%
 : clause.insert_literal ( literal clause1 -- clause2 ) recursive
     \ Inserts a literal in a clause if it does not occur.
     \
-    \ The resulting clause "clause2" is ordered.
+    \ "literal" The literal to be inserted.
+    \ "clause1" The clause to which the literal is inserted.
+    \ The address of the resulting clause might not be the address of
+    \ the initial clause. The resulting clause "clause2" is ordered.
     { literal clause }
     clause 0= GUARD
         literal 0 clause.new_node END
@@ -55,10 +86,15 @@ end-struct clause%
     clause ;
 
 : clause.show_literal' ( clause -- )
+    \ Shows the literal associated to a clause node.
+    \
+    \ "clause" The node whose literal is showed.
     clause.literal @ 1 .r ;
 
 : clause.show ( clause -- )
     \ Prints a clause.
+    \
+    \ "clause" The clause that is printed.
     { clause } [Char] ] clause bl ['] clause.show_literal' [Char] [ list.show ;
 
 : clause.merge.select' { clause1 clause2 -- c1' c2' l }
@@ -78,14 +114,20 @@ end-struct clause%
     clause.merge' ;
 
 : clause.merge ( clause1 clause2 -- clause )
+    \ Merges two clauses.
+    \
+    \ "clause1", "clause2" The clauses that are merged.
+    \ The resulting clause is ordered and does not contain duplicate
+    \ literals.
     0 0 clause.new_node dup 2swap clause.merge'
 	clause.next @ ; \ todo take care of initial dummy element
 
 : clause.equal? ( clause1 clause2 -- f ) recursive
     \ Compares two clauses for equality.
     \
-    \ "clause1", "clause2": Adresses to clauses.
-    \ "f": true if the clauses are equal, false otherwise.
+    \ "clause1", "clause2" Adresses of the clauses that are compared.
+    \ Returns true if both clauses contain the same literals, false
+    \ otherwise.
     { clause1 clause2 }
     clause1 0= GUARD
         clause2 0= IF true ELSE false ENDIF END
@@ -96,6 +138,11 @@ end-struct clause%
     clause.equal? and ;
 
 : clause.contains_literal? ( literal clause -- f)
+    \ Checks whether a given clause contains a literal.
+    \
+    \ "literal" The literal to search for in the clause.
+    \ "clause" The clause to be searched.
+    \ Returns true if the clause contains the literal, false otherwise
     ['] clause.literal ['] = 2swap list.search ;
 
 : clause.resolve ( literal clause1 clause2 -- resolvent )
@@ -110,6 +157,9 @@ end-struct clause%
 
 : clause.resolve_full ( clause1 clause2 -- res_1 ... res_n n )
     \ Resolves two clauses upon all resolvable literals.
+    \
+    \ "clause1", "clause2" The clauses to be resolved. Leaves all the
+    \ resolvents on the stack and the number of resolvents.
     { clause1 clause2 }
     0 clause1 BEGIN
         dup WHILE
