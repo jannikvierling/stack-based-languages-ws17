@@ -1,5 +1,5 @@
-require parser.fs
-require iterative_prover.fs
+require ../parser.fs
+require ../iterative_prover.fs
 
 \ A trivial example.
 

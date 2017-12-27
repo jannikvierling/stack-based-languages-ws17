@@ -1,15 +1,10 @@
+require control.fs
 require literal.fs
 require list.fs
 
 list%
-    cell% field clause-literal
+    cell% field clause.literal
 end-struct clause%
-
-: GUARD ( Compilation: -- orig; Run-time: f -- )
-    POSTPONE IF ; immediate
-
-: END ( Compilation: orig -- )
-    POSTPONE EXIT POSTPONE ENDIF ; immediate
 
 : clause.deallocator ( node -- )
     drop ;
@@ -17,83 +12,76 @@ end-struct clause%
 : clause.free ( clause -- )
     ['] clause.deallocator list.free ;
 
-: clause-next list-next ;
+: clause.next list.next ;
 
-: clause-size list-length ;
+: clause.size list.length ;
 
-: new-clause-node ( literal next -- node )
+: clause.new_node ( literal next -- node )
     \ Creates a new clause node.
-    clause% %alloc tuck clause-next ! tuck clause-literal ! ;
+    clause% %alloc tuck clause.next ! tuck clause.literal ! ;
 
-: copy-clause ( clause1 -- clause2 ) recursive
+: clause.copy ( clause1 -- clause2 ) recursive
     \ Copies a clause.
     { clause } clause 0= GUARD
         0 END
-    clause clause-literal @
-    clause clause-next @ copy-clause
-    new-clause-node ;
+    clause clause.literal @
+    clause clause.next @ clause.copy
+    clause.new_node ;
 
-\ : clauselist.deallocator ( node -- )
-\     clauselist-clause clause.free ;
-
-\ : clauselist.free ( clauselist -- )
-\     ['] clauselist.deallocator free-list ;
-
-: remove-literal ( literal clause1 -- clause2 ) recursive
+: clause.remove_literal ( literal clause1 -- clause2 ) recursive
     \ Removes a literal from a clause.
     { literal clause }
     clause 0= GUARD
         0 END
-    clause clause-literal @ literal = GUARD
-         clause clause-next @ clause list.free_node END
-    literal clause clause-next @ remove-literal
-    clause clause-next !
+    clause clause.literal @ literal = GUARD
+         clause clause.next @ clause list.free_node END
+    literal clause clause.next @ clause.remove_literal
+    clause clause.next !
     clause ;
 
-: insert-literal ( literal clause1 -- clause2 ) recursive
+: clause.insert_literal ( literal clause1 -- clause2 ) recursive
     \ Inserts a literal in a clause if it does not occur.
     \
     \ The resulting clause "clause2" is ordered.
     { literal clause }
     clause 0= GUARD
-        literal 0 new-clause-node END
-    clause clause-literal @ literal literal-greater GUARD
-        literal clause new-clause-node END
-    clause clause-literal @ literal literal-less GUARD
-        literal clause clause-next @ insert-literal
-        clause clause-next !
+        literal 0 clause.new_node END
+    clause clause.literal @ literal literal-greater GUARD
+        literal clause clause.new_node END
+    clause clause.literal @ literal literal-less GUARD
+        literal clause clause.next @ clause.insert_literal
+        clause clause.next !
         clause END        
     clause ;
 
-: show-clause' ( clause -- )
-    clause-literal @ 1 .r ;
+: clause.show_literal' ( clause -- )
+    clause.literal @ 1 .r ;
 
-: show-clause ( clause -- )
+: clause.show ( clause -- )
     \ Prints a clause.
-    { clause } [Char] ] clause bl ['] show-clause' [Char] [ list-show ;
+    { clause } [Char] ] clause bl ['] clause.show_literal' [Char] [ list.show ;
 
-: fm-choose-args { clause1 clause2 -- c1' c2' l }
-    clause1 clause-literal @ clause2 clause-literal @ literal-equal GUARD
-         clause1 clause-next @ clause2 clause-next @ clause1 clause-literal @ END
-    clause1 clause-literal @ clause2 clause-literal @ literal-less GUARD
-         clause1 clause-next @ clause2 clause1 clause-literal @ END
-    clause1 clause2 clause-next @ clause2 clause-literal @ ;
+: clause.merge.select' { clause1 clause2 -- c1' c2' l }
+    clause1 clause.literal @ clause2 clause.literal @ literal-equal GUARD
+         clause1 clause.next @ clause2 clause.next @ clause1 clause.literal @ END
+    clause1 clause.literal @ clause2 clause.literal @ literal-less GUARD
+         clause1 clause.next @ clause2 clause1 clause.literal @ END
+    clause1 clause2 clause.next @ clause2 clause.literal @ ;
 
-: fast-merge' recursive { result clause1 clause2 -- } 
+: clause.merge' recursive { result clause1 clause2 -- } 
 	clause1 0= GUARD
-		clause2 copy-clause result clause-next ! END
+		clause2 clause.copy result clause.next ! END
     clause2 0= GUARD
-        clause1 copy-clause result clause-next ! END
-    clause1 clause2 fm-choose-args
-    0 new-clause-node dup result clause-next ! -rot
-    fast-merge' ;
+        clause1 clause.copy result clause.next ! END
+    clause1 clause2 clause.merge.select'
+    0 clause.new_node dup result clause.next ! -rot
+    clause.merge' ;
 
-\ Create a dummy first element to work with, then drop it
-: fast-merge ( clause1 clause2 -- clause )
-    0 0 new-clause-node dup 2swap fast-merge'
-	clause-next @ ;
+: clause.merge ( clause1 clause2 -- clause )
+    0 0 clause.new_node dup 2swap clause.merge'
+	clause.next @ ; \ todo take care of initial dummy element
 
-: clauses-equal ( clause1 clause2 -- f ) recursive
+: clause.equal? ( clause1 clause2 -- f ) recursive
     \ Compares two clauses for equality.
     \
     \ "clause1", "clause2": Adresses to clauses.
@@ -103,48 +91,54 @@ end-struct clause%
         clause2 0= IF true ELSE false ENDIF END
     clause2 0= GUARD
         false END
-    clause1 clause-literal @ clause2 clause-literal @ =
-    clause1 clause-next @ clause2 clause-next @
-    clauses-equal and ;
+    clause1 clause.literal @ clause2 clause.literal @ =
+    clause1 clause.next @ clause2 clause.next @
+    clause.equal? and ;
 
-: contains-literal ( literal clause -- f)
-    ['] clause-literal ['] = 2swap list-search ;
+: clause.contains_literal? ( literal clause -- f)
+    ['] clause.literal ['] = 2swap list.search ;
 
-: resolve-clauses ( literal clause1 clause2 -- resolvent )
+: clause.resolve ( literal clause1 clause2 -- resolvent )
     \ Resolves two clauses upon a literal.
     \
     \ "literal": The resolved upon literal; this is a literal of
     \ clause1 and its dual must appear in clause2.
     { literal clause1 clause2 }
-    literal clause1 copy-clause remove-literal { c1 } c1
-    literal negate clause2 copy-clause remove-literal { c2 } c2
-    fast-merge c1 c2 clause.free clause.free ;
+    literal clause1 clause.copy clause.remove_literal { c1 } c1
+    literal negate clause2 clause.copy clause.remove_literal { c2 } c2
+    clause.merge c1 c2 clause.free clause.free ;
 
-: resolve-all ( clause1 clause2 -- res_1 ... res_n n )
+: clause.resolve_full ( clause1 clause2 -- res_1 ... res_n n )
     \ Resolves two clauses upon all resolvable literals.
     { clause1 clause2 }
     0 clause1 BEGIN
         dup WHILE
-            dup clause-literal @ negate clause2 contains-literal IF
-                dup clause-literal @ clause1 clause2 resolve-clauses
+            dup clause.literal @ negate clause2 clause.contains_literal? IF
+                dup clause.literal @ clause1 clause2 clause.resolve
                 rot 1+ rot
             ENDIF
-            clause-next @
+            clause.next @
     REPEAT drop ;
 
-: subsumes? ( c_2 c_1 -- f )
+: clause.subsumes_clause? ( c_2 c_1 -- f )
     \ Checks if a given clauses subsumes another clause.
     \
     \ Returns true if c_2 subsumes c_1, false otherwise.
     { c_1 } BEGIN dup 0<> WHILE
-            dup clause-literal @ c_1 contains-literal invert IF
+            dup clause.literal @ c_1 clause.contains_literal? invert IF
                 drop false EXIT ENDIF
-            list-next @
+            list.next @
     REPEAT drop true ;
 
-: subsumed? ( c_1 c_2 -- f )
+: clause.subsumed_by? ( c_1 c_2 -- f )
     \ Checks if a given clause is subsumed by another clause.
     \
     \ Returns true if c_1 is subsumed by c_2, false otherwise.
-    swap subsumes? ;
-    
+    swap clause.subsumes_clause? ;
+
+: clause.compare_by_length ( clause1 clause2 -- f )
+    \ Compares two clauses by length.
+    \
+    \ Returns true if the length of the first clause is strictly less
+    \ than the length of the second clause.
+    list.length swap list.length swap < ;

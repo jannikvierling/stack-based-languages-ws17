@@ -7,7 +7,7 @@ require clauseset.fs
 	dup 0= IF
 		drop
 	ELSE
-		1- rot rot insert-literal
+		1- rot rot clause.insert_literal
 		make-set-from-stack'
 	ENDIF ;
 	
@@ -32,7 +32,7 @@ require clauseset.fs
 	ELSE
 		set BEGIN
 			dup WHILE
-				dup set-clause @ clause resolve-all
+				dup set-clause @ clause clause.resolve_full
 				make-set-from-stack
 				swap set-next @
 		REPEAT drop

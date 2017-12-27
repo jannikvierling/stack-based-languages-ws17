@@ -13,7 +13,7 @@ variable working
     \ Appends a clause to the seen set.
     \
     \ "clause" The clause to append to the seen set.
-    seen @ append-new
+    seen @ clauselist.append_new
     seen ! ;
 
 : working-empty ( -- f )
@@ -26,7 +26,7 @@ variable working
     \ Checks whether the empty clause occurs in the working set.
     \
     \ "f" true if the empty clause is in working, false otherwise.
-    0 working @ contains-clause ;
+    0 working @ clauselist.contains_clause? ;
 
 : terminate ( -- f )
     \ Checks whether the termination condition is reached.
@@ -39,7 +39,7 @@ variable working
     \ Removes the first clause from the working clauses.
     \
     \ "clause" The clause removed from the working set.
-    working @ pop-clause swap working ! ;
+    working @ clauselist.pop swap working ! ;
 
 : shift-clause ( -- clause )
     \ Moves one clause from the head of the working set to the end of the
@@ -52,7 +52,7 @@ variable working
     \
     \ "clause" The clause to check.
     \ "f" true if the clause is not in the seen set, false otherwise.
-    seen @ contains-clause invert ;
+    seen @ clauselist.contains_clause? invert ;
 
 : dispatch-new ( clause_1 ... clause_n n -- )
     \ Dispatches a group of new clauses.
@@ -62,7 +62,7 @@ variable working
     \ "clause_1 ... clause_n" The clauses to be inserted to working.
     \ "n" The number of clauses to consider.
     0 U+DO
-        dup is-not-seen IF dup working @ insert-clause working ! ENDIF drop
+        dup is-not-seen IF dup working @ clauselist.insert_clause working ! ENDIF drop
     LOOP ;
 
 : process-clause ( clause -- )
@@ -73,7 +73,7 @@ variable working
     \ "clause" The clause to process.
     { clause } seen @ BEGIN
         dup WHILE
-            dup clauselist-clause @ clause resolve-all
+            dup clauselist.clause @ clause clause.resolve_full
             dispatch-new
             list-next @
     REPEAT drop ;
@@ -103,8 +103,8 @@ variable working
 
 : main ( input -- )
     refute { sc wc status } cr
-    ." SEEN"     cr sc show-clauselist cr cr
-    ." WORKING " cr wc show-clauselist cr cr
+    ." SEEN"     cr sc clauselist.show cr cr
+    ." WORKING " cr wc clauselist.show cr cr
     status 0 = IF ." UNSAT" cr EXIT ENDIF
     status 1 = IF ." SAT"   cr EXIT ENDIF ;
     
