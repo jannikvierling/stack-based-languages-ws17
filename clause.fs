@@ -130,26 +130,9 @@ end-struct clause%
             list-next @
     REPEAT drop true ;
 
-1 2 3 4 5 6 0 6 times insert-literal
-1 4 5 0 3 times insert-literal
-subsumes? invert .
-
-1 4 5 0 3 times insert-literal
-1 2 3 4 5 6 0 6 times insert-literal
-subsumes? .
-
-1 0 insert-literal
-1 0 insert-literal
-subsumes? .
-
-0 0 subsumes? .
-
--1 0 insert-literal
-1 0 insert-literal
-subsumes? invert .
-
-1 0 insert-literal
--1 0 insert-literal
-subsumes? invert .
-
-
+: subsumed? ( c_1 c_2 -- f )
+    \ Checks if a given clause is subsumed by another clause.
+    \
+    \ Returns true if c_1 is subsumed by c_2, false otherwise.
+    swap subsumes? ;
+    

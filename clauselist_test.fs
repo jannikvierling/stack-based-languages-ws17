@@ -59,12 +59,12 @@ dup 0 swap list-next @ list-next !
 
 list-length 2 = .
 
-\ Test: append-if-new
+\ Test: append-new
 
 \ (1) New clause should be appended
 
 1 2 3 0 3 times insert-literal
-0 append-if-new
+0 append-new
 
 dup list-length 1 = .
 
@@ -76,7 +76,7 @@ clauses-equal .
 
 1 2 3 0 3 times insert-literal
 1 2 3 0 3 times insert-literal
-0 append-if-new append-if-new
+0 append-new append-new
 
 dup list-length 1 = .
 
@@ -90,14 +90,14 @@ clauses-equal .
 
 -1 0 1 times insert-literal 
  1 0 1 times insert-literal 
-0 2 times append-if-new
+0 2 times append-new
 1 0 1 times insert-literal swap contains-clause .
 
 \ (2) Non-contained clause should not be found.
 
 -1 0 1 times insert-literal 
  1 0 1 times insert-literal 
-0 2 times append-if-new
+0 2 times append-new
 2 3 0 2 times insert-literal swap
 contains-clause invert .
 
@@ -141,5 +141,5 @@ list-next @ 0= .
 
 -1 2 -3 -5 4 6 10 0 7 times insert-literal 
  1 0 1 times insert-literal 
-0 2 times append-if-new
+0 2 times append-new
 show-clauselist

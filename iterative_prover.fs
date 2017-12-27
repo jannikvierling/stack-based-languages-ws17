@@ -13,7 +13,7 @@ variable working
     \ Appends a clause to the seen set.
     \
     \ "clause" The clause to append to the seen set.
-    seen @ append-if-new
+    seen @ append-new
     seen ! ;
 
 : working-empty ( -- f )

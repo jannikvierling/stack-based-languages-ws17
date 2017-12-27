@@ -9,6 +9,9 @@ end-struct clauselist%
 : contains-clause ( clause* list<clause*> -- f )
     { clause list } ['] clauselist-clause ['] clauses-equal clause list list-search ;
 
+: is_subsumed? ( clause* list<clauselist*> -- f )
+    { clause list } ['] clauselist-clause [']  subsumed? clause list list-search ;
+
 : show' ( clauselist -- )
     clauselist-clause @ show-clause ;
 
@@ -23,16 +26,23 @@ end-struct clauselist%
     dup clause swap clauselist-clause !
     dup next swap list-next ! ;
 
-: append-if-new ( clause clauselist -- clauselist )
-    dup 0= GUARD
+: last-node ( list -- last )
+    BEGIN dup list-next @ 0<> WHILE
+            list-next @
+    REPEAT ;
+    
+: is_emptylist? ( list -- f )
+    0= ;
+
+: append ( clause clauselist -- clauselist )
+    dup is_emptylist? GUARD
         drop 0 new-clause-list-node END
-    tuck 0 BEGIN
-            drop
-            over over clauselist-clause @ clauses-equal IF
-                2drop EXIT
-            ENDIF dup list-next @ swap
-        over 0=
-        UNTIL nip swap 0 new-clause-list-node swap list-next ! ;
+    tuck last-node swap 0 new-clause-list-node swap list-next ! ;
+
+: append-new ( clause clauselist -- clauselist )
+    2dup contains-clause GUARD
+        nip END
+    append ;
 
 : length-comparator ( clause1 clause2 -- f )
     list-length swap list-length swap < ;
