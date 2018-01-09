@@ -25,6 +25,9 @@ end-struct clause%
     \ Returns a the clause address to which the next-offset is added.
     list.next ;
 
+: clause->literal ( clause -- literal )
+    clause.literal @ ;
+
 : clause.size ( clause -- n )
     \ Computes a given clause's size.
     \
@@ -45,7 +48,7 @@ end-struct clause%
     \
     \ Creates a deep copy of the clause. Returns the address of the
     \ copy.
-    { clause } clause 0= GUARD
+    { clause } clause list.is_empty? GUARD
         0 END
     clause clause.literal @
     clause clause.next @ clause.copy
@@ -59,7 +62,7 @@ end-struct clause%
     \ The clause's address might change. Returns the address of the
     \ clause after removal of the literal.
     { literal clause }
-    clause 0= GUARD
+    clause list.is_empty? GUARD
         0 END
     clause clause.literal @ literal = GUARD
          clause clause.next @ clause list.free_node END
@@ -77,9 +80,9 @@ end-struct clause%
     { literal clause }
     clause 0= GUARD
         literal 0 clause.new_node END
-    clause clause.literal @ literal literal-greater GUARD
+    clause clause.literal @ literal literal.> GUARD
         literal clause clause.new_node END
-    clause clause.literal @ literal literal-less GUARD
+    clause clause.literal @ literal literal.< GUARD
         literal clause clause.next @ clause.insert_literal
         clause clause.next !
         clause END        
@@ -97,17 +100,23 @@ end-struct clause%
     \ "clause" The clause that is printed.
     { clause } [Char] ] clause bl ['] clause.show_literal' [Char] [ list.show ;
 
+: clause.literal.=
+    clause->literal swap clause->literal swap literal.= ;
+
+: clause.literal.<
+    clause->literal swap clause->literal swap literal.< ;
+
 : clause.merge.select' { clause1 clause2 -- c1' c2' l }
-    clause1 clause.literal @ clause2 clause.literal @ literal-equal GUARD
+    clause1 clause2 clause.literal.= GUARD
          clause1 clause.next @ clause2 clause.next @ clause1 clause.literal @ END
-    clause1 clause.literal @ clause2 clause.literal @ literal-less GUARD
-         clause1 clause.next @ clause2 clause1 clause.literal @ END
+    clause1 clause2 clause.literal.< GUARD
+         clause1 clause.next @ clause2 clause1 clause->literal END
     clause1 clause2 clause.next @ clause2 clause.literal @ ;
 
 : clause.merge' recursive { result clause1 clause2 -- } 
-	clause1 0= GUARD
+	clause1 list.is_empty? GUARD
 		clause2 clause.copy result clause.next ! END
-    clause2 0= GUARD
+    clause2 list.is_empty? GUARD
         clause1 clause.copy result clause.next ! END
     clause1 clause2 clause.merge.select'
     0 clause.new_node dup result clause.next ! -rot

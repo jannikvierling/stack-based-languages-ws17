@@ -39,13 +39,11 @@ end-struct clauselist%
     \ Pops the head of a given clause list.
     list.pop swap clauselist.clause @ ;
 
-: clauselist.new_node { clause next -- list }
+: clauselist.new_node ( clause next -- list )
     \ Creates a new clause list node.
     \
     \ The new node references "clause" and its successor is "next.
-    clauselist% %alloc { new }
-    clause new clauselist.clause !
-    next new list.next ! new ;
+    clauselist% %alloc tuck list.next ! tuck clauselist.clause ! ;
 
 : clauselist.append ( clause clauselist -- clauselist )
     \ Appends a clause to a clause list.
