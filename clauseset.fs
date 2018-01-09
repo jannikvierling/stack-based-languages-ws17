@@ -5,7 +5,7 @@ struct
     cell% field set-clause
 end-struct set%
 
-: set-size ( set -- n ) clause-size ;
+: set-size ( set -- n ) clause.size ;
 
 \ Deep copy
 : copy-set ( set1 -- set2 ) recursive
@@ -14,17 +14,17 @@ end-struct set%
     ELSE
         set set-next @ copy-set
         set% %allot dup rot rot set-next !
-        set set-clause @ copy-clause over set-clause !
+        set set-clause @ clause.copy over set-clause !
     ENDIF ;
 
 : remove-clause ( clause set1 -- set2 ) recursive
     { clause set } set 0= IF
         0
     ELSE
-        set set-clause @ clause clauses-equal IF
+        set set-clause @ clause clause.equal? IF
             set set-next @
         ELSE
-            clause set set-next @ remove-literal
+            clause set set-next @ clause.remove_literal
             set set-next !
             set
         ENDIF
@@ -36,10 +36,10 @@ end-struct set%
         set% %allot
         0 over set-next !
         clause over set-clause !
-    ELSE set set-clause @ clause clauses-equal IF
+    ELSE set set-clause @ clause clause.equal? IF
             set
 		ELSE
-			clause set set-next @ insert-literal
+			clause set set-next @ clause.insert_literal
 			set set-next !
 			set
 		ENDIF ENDIF ;
@@ -57,7 +57,7 @@ end-struct set%
 : show-set' ( set1 -- ) recursive
     dup 0<> IF
         dup
-        set-clause @ show-clause
+        set-clause @ clause.show
         set-next @ show-set'
     ENDIF ;
 
@@ -75,12 +75,12 @@ end-struct set%
     ENDIF ;
         
 : merge-sets ( set1 set2 -- set )
-    { set1 set2 } set1 copy-clause set2 merge-sets' ;
+    { set1 set2 } set1 clause.copy set2 merge-sets' ;
 	
 : contains-clause ( clause set -- x ) recursive
     dup 0= IF 2drop false
     ELSE
-        2dup set-clause @ clauses-equal IF
+        2dup set-clause @ clause.equal? IF
             2drop true
         ELSE
             set-next @ contains-clause

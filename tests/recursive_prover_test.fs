@@ -1,9 +1,9 @@
-require util.fs
-require literal.fs
-require clause.fs
-require clauseset.fs
-require recursive_prover.fs
-require parser.fs
+require ../util.fs
+require ../literal.fs
+require ../clause.fs
+require ../clauseset.fs
+require ../recursive_prover.fs
+require ../parser.fs
 
 
 begin-dimacs
@@ -52,8 +52,8 @@ constant pres-example
 
 \ ----------------------------------------------
 
-1 2 3 0		3 times insert-literal constant c0
--1 -2 4 0	3 times insert-literal constant c1
+1 2 3 0		3 times clause.insert_literal constant c0
+-1 -2 4 0	3 times clause.insert_literal constant c1
 
 
 \ c0 c1 resolve-all
