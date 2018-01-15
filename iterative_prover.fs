@@ -97,11 +97,23 @@ variable working
     -1 ;
 
 : refute ( input -- seen working status )
+    \ Refutes a given input.
+    \
+    \ After this word terminates the concatenation of the sets seen
+    \ and working represents a resolution deduction from the
+    \ input. According to the status it is either a resolution
+    \ refutation of the input or it is a saturated deduction, that is
+    \ the input is satisfiable. The status is 0 if the input is
+    \ unsatisfiable, and 1 if the input is satisfiable.
     working ! 0 seen !
     refute'
     seen @ working @ status ;
 
 : main ( input -- )
+    \ Runs the resolution prover on the given input.
+    \
+    \ After the resolution prover has terminated this word prints out
+    \ the result of the refutation procedure.
     refute { sc wc status } cr
     ." SEEN"     cr sc clauselist.show cr cr
     ." WORKING " cr wc clauselist.show cr cr

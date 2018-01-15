@@ -100,22 +100,36 @@ end-struct clause%
     \ "clause" The clause that is printed.
     { clause } [Char] ] clause bl ['] clause.show_literal' [Char] [ list.show ;
 
-: clause.literal.=
+: clause.literal.= ( clause1 clause2 -- f )
+    \ Compares two clauses by their head literal.
+    \
+    \ Compares the literals stored in the first node of two non-empty
+    \ clauses. If the literals are equal then f is true, otherwise f
+    \ is false.
     clause->literal swap clause->literal swap literal.= ;
 
 : clause.literal.<
+    \ Compares two clauses by their head literal.
+    \
+    \ Compares the literals stored in the first node of two non-empty
+    \ clauses. If the first literal is strictly less than the second
+    \ one, then f is true, otherwise f is false.
     clause->literal swap clause->literal swap literal.< ;
 
 : clause.merge.select' { clause1 clause2 -- c1' c2' l }
+    \ Selects the values for recursion of the clause merge algorithm.
     clause1 clause2 clause.literal.= GUARD
          clause1 clause.next @ clause2 clause.next @ clause1 clause.literal @ END
     clause1 clause2 clause.literal.< GUARD
          clause1 clause.next @ clause2 clause1 clause->literal END
     clause1 clause2 clause.next @ clause2 clause.literal @ ;
 
-: clause.merge' recursive { result clause1 clause2 -- } 
-	clause1 list.is_empty? GUARD
-		clause2 clause.copy result clause.next ! END
+: clause.merge' recursive { result clause1 clause2 -- }
+    \ Merges two clauses in linear time.
+    \
+    \ Merges the two given clauses and appends the result to 'result.
+    clause1 list.is_empty? GUARD
+        clause2 clause.copy result clause.next ! END
     clause2 list.is_empty? GUARD
         clause1 clause.copy result clause.next ! END
     clause1 clause2 clause.merge.select'
@@ -138,9 +152,9 @@ end-struct clause%
     \ Returns true if both clauses contain the same literals, false
     \ otherwise.
     { clause1 clause2 }
-    clause1 0= GUARD
+    clause1 list.is_empty? GUARD
         clause2 0= IF true ELSE false ENDIF END
-    clause2 0= GUARD
+    clause2 list.is_empty? GUARD
         false END
     clause1 clause.literal @ clause2 clause.literal @ =
     clause1 clause.next @ clause2 clause.next @
@@ -164,6 +178,13 @@ end-struct clause%
     literal negate clause2 clause.copy clause.remove_literal { c2 } c2
     clause.merge c1 c2 clause.free clause.free ;
 
+: clause.contains_dual? ( literal clause -- f )
+    \ Checks whether the clause contains the dual of a given literal.
+    \
+    \ If the clause contains the dual then f is true, otherwise f is
+    \ false.
+    swap literal.dual swap clause.contains_literal? ;
+
 : clause.resolve_full ( clause1 clause2 -- res_1 ... res_n n )
     \ Resolves two clauses upon all resolvable literals.
     \
@@ -171,8 +192,8 @@ end-struct clause%
     \ resolvents on the stack and the number of resolvents.
     { clause1 clause2 }
     0 clause1 BEGIN
-        dup WHILE
-            dup clause.literal @ negate clause2 clause.contains_literal? IF
+        dup WHILE ( current )
+            dup clause->literal clause2 clause.contains_dual? IF
                 dup clause.literal @ clause1 clause2 clause.resolve
                 rot 1+ rot
             ENDIF
