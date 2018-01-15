@@ -26,6 +26,7 @@ end-struct clause%
     list.next ;
 
 : clause->literal ( clause -- literal )
+    \ Retrieves the head literal.
     clause.literal @ ;
 
 : clause.size ( clause -- n )
@@ -64,7 +65,7 @@ end-struct clause%
     { literal clause }
     clause list.is_empty? GUARD
         0 END
-    clause clause.literal @ literal = GUARD
+    clause clause->literal literal literal.= GUARD
          clause clause.next @ clause list.free_node END
     literal clause clause.next @ clause.remove_literal
     clause clause.next !
@@ -194,7 +195,7 @@ end-struct clause%
     0 clause1 BEGIN
         dup WHILE ( current )
             dup clause->literal clause2 clause.contains_dual? IF
-                dup clause.literal @ clause1 clause2 clause.resolve
+                dup clause->literal clause1 clause2 clause.resolve
                 rot 1+ rot
             ENDIF
             clause.next @
