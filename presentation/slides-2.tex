@@ -1,0 +1,39 @@
+\documentclass{beamer}
+
+\usetheme{Szeged}
+
+\usepackage[utf8]{inputenc}
+\usepackage{bussproofs}
+\usepackage[]{algorithm2e}
+
+\author{Jannik Vierling \and Thomas Baumhauer}
+\title{Stackbasierte Sprachen -- WS 2017}
+\subtitle{Aussagenlogischer Resolutionsbeweiser}
+
+\begin{document}
+
+\frame{
+  \maketitle
+}
+
+\frame{
+  \frametitle{Aussagenlogisches Resolutionsbeweisen}
+  Resolution:
+  \begin{prooftree}
+    \AxiomC{$\Gamma \rightarrow \Delta, A$}
+    \AxiomC{$A, \Pi \rightarrow \Lambda$}
+    \BinaryInfC{$\Gamma, \Pi \rightarrow \Delta, \Lambda$}
+  \end{prooftree}
+  Resolutionsbeweise:
+  \begin{itemize}
+  \item Resolution auf Klauseln $S_0$ anwenden bis \dots
+    \begin{itemize}
+    \item Leerklausel $\rightarrow$ abgeleitet {\color{blue}$\leadsto$ UNSAT} 
+    \item keine neue Klausel ableitbar {\color{blue}$\leadsto$ SAT}
+    \end{itemize}
+    \item Beweis für Unerfüllbarkeit von $S_0$ (bzw. Gültigkeit von $\neg S_0$).
+  \end{itemize}
+}
+
+
+\end{document}
