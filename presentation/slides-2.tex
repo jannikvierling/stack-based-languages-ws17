@@ -35,5 +35,85 @@
   \end{itemize}
 }
 
+\frame{
+	\frametitle{{[ -2 ][ 1 2 ][ -1 2 ]} refute}
+	\texttt{\scriptsize
+	Seen:\hspace{1.5em} { }					 \\
+	Working: { [ -2 ][ 1 2 ][ -1 2 ]}					 \\
+	-----------------------					 \\
+	Seen:\hspace{1.5em} { [ -2 ]}					 \\
+	Working: { [ -1 2 ][ 1 2 ]}					 \\
+	-----------------------					 \\
+	Seen:\hspace{1.5em} { [ -2 ][ -1 2 ]}					 \\
+	Working: { [ -1 ][ 1 2 ]}					 \\
+	-----------------------					 \\
+	Seen:\hspace{1.5em} { [ -2 ][ -1 2 ][ -1 ]}					 \\
+	Working: { [ 1 2 ]}					 \\
+	-----------------------					 \\
+	Seen:\hspace{1.5em} { [ -2 ][ -1 2 ][ 1 2 ][ -1 ]}					 \\
+	Working: { [ 1 ][ 2 ]}					 \\
+	-----------------------					 \\
+	Seen:\hspace{1.5em} { [ -2 ][ -1 2 ][ 1 2 ][ -1 ][ 1 ]}					 \\
+	Working: { [ 2 ][ ]}					 \\
+	=======================					 \\
+	UNSAT ok
+	}
+}
+
+\frame{
+	\frametitle{{[ 1 2 ][ -1 2 ][ 2 3 ]} refute}
+	\texttt{\scriptsize
+	Seen: { }					 \\
+	Working: { [ 1 2 ][ -1 2 ][ 2 3 ]}					 \\
+	-----------------------					 \\
+	Seen:\hspace{1.5em}  { [ 1 2 ]}					 \\
+	Working: { [ -1 2 ][ 2 3 ]}					 \\
+	-----------------------					 \\
+	Seen:\hspace{1.5em} { [ 1 2 ][ -1 2 ]}					 \\
+	Working: { [ 2 ][ 2 3 ]}					 \\
+	-----------------------					 \\
+	Seen:\hspace{1.5em} { [ 1 2 ][ -1 2 ][ 2 ]}					 \\
+	Working: { [ 2 3 ]}					 \\
+	-----------------------					 \\
+	Seen:\hspace{1.5em} { [ 1 2 ][ -1 2 ][ 2 3 ][ 2 ]}					 \\
+	Working: { }					 \\
+	=======================					 \\
+	SAT ok
+	}
+}
+
+\frame{
+	\frametitle{Programmiertechnik: ``Streams''}
+	Funktion liefert keine feste Zahl von Rückgabewerten
+	$\Rightarrow$ lege Lösungen und Zähler auf den Stack.
+			
+	$ $
+	
+	{\bf Beispiel:} Resolvieren zweier Klauseln
+	
+	$ $
+	
+	\texttt{\scriptsize
+	[ 1 2 3 ] [ -1 -2 4 ] clause.resolve\_full  ok \\
+	.s <3> 17240464 17240624 2  ok \\
+	make-set-from-stack  ok \\
+	.s <1> 17240368  ok \\
+	show-set \{[ -2 2 3 4 ][ -1 1 3 4 ]\} ok \\
+	}
+}
+
+\frame{
+	\frametitle{Programmiertechnik: ``Streams''}
+	
+	Vergleiche in Haskell: Generator/Selektor-Prinzip
+	
+	$ $
+	
+	\texttt{\scriptsize
+		fibs = 0 : 1 : zipWith (+) fibs (tail fibs) \\
+		take 5 fibs \\
+		{[0,1,1,2,3]}
+	}
+}
 
 \end{document}
